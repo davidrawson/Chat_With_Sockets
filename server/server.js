@@ -1,6 +1,7 @@
-var express = require('express');
-var app = express();
-var http = require('http').Server(app);
+const express = require('express');
+const app = express();
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
 
 // allows cross origin resource sharing
 app.use(function(req, res, next) {
@@ -10,9 +11,16 @@ app.use(function(req, res, next) {
   next();
 });
 
-var server = http.listen(3001, () => {
-  var host = server.address().address;
-  var port = server.address().port;
+// listen out for connections
+io.on('connection', socket => {
+  socket.on('chat', message => {
+    io.sockets.emit('chat', message);
+  });
+});
+
+const server = http.listen(3001, () => {
+  const host = server.address().address;
+  const port = server.address().port;
 
   console.log('Example app listening at http://%s:%s', host, port);
 });

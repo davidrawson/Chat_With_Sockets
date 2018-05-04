@@ -2,6 +2,8 @@ import React from 'react';
 import ChatForm from '../components/ChatForm';
 import Message from '../components/Message';
 import './ChatContainer.css';
+// it is the client side package we import
+import io from 'socket.io-client';
 
 export default class ChatContainer extends React.Component {
   constructor(props) {
@@ -12,6 +14,9 @@ export default class ChatContainer extends React.Component {
       name: null,
       msg: null
     };
+
+    this.socket = io("http://localhost:3001");
+    this.socket.on('chat', this.addMessage.bind(this));
 
     this.submitForm = this.submitForm.bind(this);
     this.nameKeyUp = this.nameKeyUp.bind(this);
@@ -46,7 +51,8 @@ export default class ChatContainer extends React.Component {
       // construct a new message
       const newMessage = { author: this.state.name, text: this.state.msg };
 
-      this.addMessage(newMessage);
+      // send newMessage to the server
+      this.socket.emit('chat', newMessage);
     }
   }
 
